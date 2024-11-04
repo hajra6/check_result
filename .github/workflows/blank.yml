@@ -1,0 +1,25 @@
+name: Apply Branch Protection Rules
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  protect-branch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Apply Branch Protection
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api \
+            -X PUT \
+            -H "Accept: application/vnd.github+json" \
+            "/repos/${{ github.repository }}/branches/main/protection" \
+            -f required_status_checks.strict=true \
+            -f required_pull_request_reviews.dismiss_stale_reviews=true \
+            -f enforce_admins=true
